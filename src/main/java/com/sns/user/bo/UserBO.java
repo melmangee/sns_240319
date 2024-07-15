@@ -18,6 +18,13 @@ public class UserBO {
 		return userRepository.findByLoginId(loginId);
 	}
 	
+	// input: loginId, password
+	// output: UserEntity or null
+	public UserEntity getUserEntityByLoginIdAndPassword(String loginId, String password) {
+		return userRepository.findUserEntityByLoginIdAndPassword(loginId, password);
+	}
+	
+	
 	// input: 4파라미터
 	// output: UserEntity
 	public UserEntity addUser(String loginId, String password, String name, String email) {

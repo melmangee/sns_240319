@@ -32,6 +32,37 @@
 
 <th:block layout:fragment="script">
     <script>
-
+		$(document).ready(function() {
+			$("form").on('submit', function(e) {
+				e.preventDefault();
+				
+				let loginId = $("input[name= loginId]").val().trim();
+				let password = $("input[name= password]").val();
+				
+				if (!loginId) {
+					alert("아이디를 입력해주세요");
+				}
+				
+				if (!password) {
+					alert("비밀번호를 입력해주세요");
+				}
+				
+				let url = $(this).attr('action'); // action 속성 url에 담는다.
+				console.log(url); // url 콘솔 표시
+				let params = $(this).serialize();
+				console.log(params); // 입력값
+				
+				// AJAX
+				$.post(url, params) // request
+				.done(function(data) {
+					if (data.result == "성공") {
+						location.href =  "timeline/timeline-view";
+					} else {
+						alert(data.error_message);
+					}
+				});
+				
+			}); // 서브밋 함수 끝
+		}); // ready 함수 끝
     </script>
 </th:block>
