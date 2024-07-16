@@ -56,7 +56,7 @@
 				$.post(url, params) // request
 				.done(function(data) {
 					if (data.result == "성공") {
-						location.href =  "timeline/timeline-view";
+						location.href =  "/timeline/timeline-view";
 					} else {
 						alert(data.error_message);
 					}
