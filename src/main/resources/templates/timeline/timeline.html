@@ -10,7 +10,7 @@
 			<textarea id="writeTextArea" placeholder="내용을 입력해주세요" class="w-100 border-0"></textarea>
 			
 			<div class="d-flex justify-content-between">
-				<div class="file-upload d-flex ">
+				<div class="file-upload d-flex">
 					<!-- file 태그를 숨겨두고 이미지를 클릭하면 파일을 클릭한 것과 같은 효과를 준다. -->
 					<input type="file" id="file" accept=".jpg, .png, .gif" class="d-none">
 				
@@ -27,20 +27,20 @@
 		<div class="timeline-box my-5">
 			
 			<!-- 글(카드) 반복 -->
-			<div th:each="post : ${postList}" class="card border rounded mt-3">
+			<div th:each="cardView : ${cardViewList}" class="card border rounded mt-3">
 				<!-- 글쓴이, 더보기(삭제) -->
 				<div class="p-2 d-flex justify-content-between">
-					<span class="font-weight-bold" th:text="${post.userId}">글쓴이</span>
+					<span class="font-weight-bold" th:text="${cardView.user.loginId}">글쓴이</span>
 					
 					<!-- 더보기 ...(로그인 된 사람과 글쓴이 정보 일치할 때 보이게) -->
-					<a th:if="${session.userId == post.userId}" href="#" class="more-btn">
+					<a th:if="${session.userId == cardView.post.userId}" href="#" class="more-btn">
 						<img src="https://www.iconninja.com/files/860/824/939/more-icon.png" width="30">
 					</a>
 				</div>
 				
 				<!-- 본문 이미지 -->
 				<div class="card-img">
-					<img th:src="${post.imagePath}" class="w-100" alt="본문 이미지">
+					<img th:src="${cardView.post.imagePath}" class="w-100" alt="본문 이미지">
 				</div>
 				
 				<!-- 좋아요 -->
@@ -51,8 +51,8 @@
 				
 				<!-- 글 -->
 				<div class="card-post m-3">
-					<span class="font-weight-bold" th:text="${post.userId}">글쓴이</span>
-					<span th:text="${post.content}">글 내용입니다!!!!</span>
+					<span class="font-weight-bold" th:text="${cardView.post.userId}">글쓴이</span>
+					<span th:text="${cardView.post.content}">글 내용입니다!!!!</span>
 				</div>
 				
 				<!-- 댓글 제목 -->
@@ -63,9 +63,9 @@
 				<!-- 댓글 목록 -->
 				<div class="card-comment-list m-2">
 					<!-- 댓글들 -->
-					<div class="card-comment m-1">
-						<span class="font-weight-bold">댓글쓰니</span>
-						<span>댓글 내용임</span>
+					<div class="card-comment m-1" th:each="commentView : ${cardView.commentList}">
+						<span class="font-weight-bold" th:text="${commentView.user.loginId}">댓글쓰니</span>
+						<span th:text="${commentView.comment.content}">댓글 내용임</span>
 						
 						<!-- 댓글 삭제(자신의 댓글만 가능) -->
 						<a href="#" class="comment-del-btn">
@@ -76,7 +76,7 @@
 					<!-- 댓글 쓰기 -->
 					<div class="comment-write d-flex border-top mt-2">
 						<input type="text" class="comment-input form-control border-0 mr-2" placeholder="댓글 달기">
-						<button type="button" class="comment-btn btn btn-light" th:data-post-id="${post.id}" th:data-user-id="${session.userId}">게시</button>
+						<button type="button" class="comment-btn btn btn-light" th:data-post-id="${cardView.post.id}" th:data-user-id="${session.userId}">게시</button>
 					</div>
 				</div> <!-- 댓글 끝 -->
 			</div> <!-- 카드 끝 -->
@@ -87,25 +87,25 @@
 <th:block layout:fragment="script">
     <script>
 		$(document).ready(function() {
-			// 이미지 a태그 클릭 => 숨겨져 있는 id= "file" 태그 동작시킴
+			// 이미지 a태그 클릭 => 숨겨져 있는 id="file" 태그 동작시킴
 			$("#fileUploadBtn").on('click', function(e) {
 				e.preventDefault(); // 위로 올라가는 현상 방지
 				//alert("클릭");
 				$("#file").click(); // input type="file" 클릭
-			}); // fileUploadBtn 끝
+			});
 			
-			// 파일이 선택 될때, 1.유효성 체크 2.파일명 노출
+			// 파일이 선택될 때, 1.유효성 체크  2.파일명 노출
 			$("#file").on('change', function(e) {
-				// 취소를 누를 때 처리(파일이 비워지므로 . name에서 에러 발생)
+				// 취소를 누를 때 처리(파일이 비워지므로 .name에서 에러 발생)
 				let file = e.target.files[0];
 				if (file == null) {
-					$("#file").val(""); // 파일 태그에 올라온 것 제거 (보이지 않지만 꼭! 처리)
-					$("#fileName").text(""); //  보여지고 있는 파일명 초기화
+					$("#file").val("");
+					$("#fileName").text("");
 					return;
 				}
 				
 				//alert("이미지 선택");
-				let fileName= e.target.files[0].name; // peacock-1290248_1280.jpg
+				let fileName = e.target.files[0].name; // leaves-8724660_640.jpg
 				console.log(fileName);
 				
 				// 1. 확장자 validation
@@ -114,16 +114,15 @@
 				
 				if (ext != "gif" && ext != "png" && ext != "jpg") {
 					alert("이미지 파일만 업로드 할 수 있습니다.");
-					$("#file").val(""); // 파일 태그에 올라온 것 제거 (보이지 않지만 꼭! 처리)
-					$("#fileName").text(""); //  보여지고 있는 파일명 초기화
+					$("#file").val(""); // 파일 태그에 올라온 것 제거(보이지 않지만 꼭! 처리)
+					$("#fileName").text(""); // 보여지고 있는 파일명 초기화
 					return;
 				}
 				
 				// 2. 파일명 노출
 				$("#fileName").text(fileName);
-					
-			}); // fileChange Btn click	
-					
+			});
+			
 			// 글쓰기
 			$("#writeBtn").on('click', function() {
 				//alert("게시 버튼");
@@ -176,17 +175,15 @@
 						alert("글 저장에 실패했습니다. 관리자에게 문의해주세요.");
 					}
 				});  // --- ajax 끝
-				
-			}); // insert 게시 버튼 클릭
+			});
 			
-			// 댓글 게시버튼 클릭
-			$(".comment-btn").on('click',function() {
-				
-				let userId = $(this).data("user-id"); // 로그인 했는지 구분
+			// 댓글 게시 버튼 클릭(댓글 쓰기)
+			$(".comment-btn").on('click', function() {
+				let userId = $(this).data("user-id");
 				if (!userId) {
 					// 비로그인
-					alert("로그인을 해주세요");
-					location.href="/user/sign-in-view";
+					alert("로그인을 해주세요.");
+					location.href = "/user/sign-in-view";
 					return;
 				}
 				
@@ -201,37 +198,31 @@
 				console.log(content);
 				
 				if (!content) {
-					alert("댓글 내용을 입력하세요");
+					alert("댓글 내용을 입력하세요.");
 					return;
 				}
 				
-				// AJAX
 				$.ajax({
-					// request
 					type:"post"
-					, url: "/comment/create"
-					, data: {"postId" : postId, "content" : content}
-				
-					// response
-					, success : function(data) {
+					, url:"/comment/create"
+					, data:{"postId":postId, "content":content}
+					, success:function(data) {
 						if (data.code == 200) {
-							location.reload();
-						} else if (data.code == 403){
+							location.reload(true);
+						} else if (data.code == 403) {
 							// 비로그인
-							alert(data.error_massage);
+							alert(data.error_message);
 							location.href = "/user/sign-in-view";
-						} else {
+						} else{
 							alert(data.error_message);
 						}
 					}
 					, error:function(e) {
-						alert("댓글 쓰는데 실패했습니다.")
+						alert("댓글 쓰기에 실패했습니다.");
 					}
-					
-				}); // comment-btn ajax 끝
-				
-			}); // 댓글 게시 버튼 클릭
-				
-		})// ready 함수
+				});
+			});
+			
+		}); // --ready 함수 끝
     </script>
 </th:block>
