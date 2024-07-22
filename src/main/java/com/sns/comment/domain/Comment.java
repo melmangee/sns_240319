@@ -9,8 +9,8 @@ import lombok.ToString;
 @Data
 public class Comment {
 	private int id;
-	private int userId;
 	private int postId;
+	private int userId;
 	private String content;
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;

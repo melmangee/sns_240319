@@ -12,14 +12,14 @@ import com.sns.timeline.domain.CardView;
 
 @Controller
 public class TimelineController {
-	
+
 	@Autowired
 	private TimelineBO timelineBO;
 	
 	@GetMapping("/timeline/timeline-view")
 	public String timelineView(Model model) {
 //		List<PostEntity> postList = postBO.getPostEntityList();
-		//List<Comment>
+//		List<Comment>
 		List<CardView> cardViewList = timelineBO.generateCardViewList();
 		
 		//model.addAttribute("postList", postList);

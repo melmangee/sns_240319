@@ -38,9 +38,6 @@ public class UserEntity {
 	
 	private String email;
 	
-	@Column(name = "profileImageUrl")
-	private String profileImageUrl;
-	
 	@CreationTimestamp
 	@Column(name = "createdAt")
 	private LocalDateTime createdAt;

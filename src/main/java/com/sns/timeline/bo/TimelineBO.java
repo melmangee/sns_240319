@@ -16,7 +16,7 @@ import com.sns.user.entity.UserEntity;
 
 @Service
 public class TimelineBO {
-
+	
 	@Autowired
 	private PostBO postBO;
 	
@@ -25,34 +25,32 @@ public class TimelineBO {
 	
 	@Autowired
 	private CommentBO commentBO;
-	
-	// input: X
-	// output: List<CardView>
+
+	// input:X    output: List<CardView>
 	public List<CardView> generateCardViewList() {
 		List<CardView> cardViewList = new ArrayList<>();
 		
 		// 글목록을 가져온다. List<PostEntity>
 		List<PostEntity> postList = postBO.getPostEntityList();
 		
-		// 글목록 반목문 순회
-		// PostEntity => CardView 	-> cardViewList에 넣기
+		// 글목록 반복문 순회
+		// PostEntity => CardView     -> cardViewList에 넣기
 		for (PostEntity post : postList) {
 			CardView card = new CardView();
 			
 			// 글
 			card.setPost(post);
-	
+			
 			// 글쓴이
-//			post.getUserId()
 			UserEntity user = userBO.getUserEntityById(post.getUserId());
 			card.setUser(user);
 			
 			// 댓글 N개
 			List<CommentView> commentViewList = commentBO.generateCommentViewListByPostId(post.getId());
-			// TODO 댓글을 카드에 넣는다.
+			// 댓글을 카드에 넣는다.
 			card.setCommentList(commentViewList);
 			
-			// !!!!!!!!!!! 반드시 리스트에 넣는다.
+			//!!!!!!!!! 반드시 리스트에 넣는다.
 			cardViewList.add(card);
 		}
 		

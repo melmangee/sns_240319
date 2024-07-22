@@ -6,7 +6,7 @@ import com.sns.user.entity.UserEntity;
 
 public interface UserRepository extends JpaRepository<UserEntity, Integer> {
 
-	//JPQL
 	public UserEntity findByLoginId(String loginId);
-	public UserEntity findUserEntityByLoginIdAndPassword(String loginId, String password);
+	
+	public UserEntity findByLoginIdAndPassword(String loginId, String password);
 }
