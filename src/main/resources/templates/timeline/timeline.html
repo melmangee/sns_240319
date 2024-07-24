@@ -45,7 +45,10 @@
 				
 				<!-- 좋아요 -->
 				<div class="card-like m-3">
-					<img src="https://www.iconninja.com/files/214/518/441/heart-icon.png" width="18" height="18" alt="empty heart">
+					<a href="#" class="like-btn" th:data-post-id="${cardView.post.id}">
+						<img src="https://www.iconninja.com/files/214/518/441/heart-icon.png" width="18" height="18" alt="empty heart">
+						<img src="https://www.iconninja.com/files/527/809/128/heart-icon.png" width="18" height="18" alt="filled heart">
+					</a>
 					<span th:text="|좋아요 13개|"></span>
 				</div>
 				
@@ -247,6 +250,33 @@
 					}
 				});
 			});
+			
+			// likebtn 클릭
+			$(".like-btn").on('click', function(e) {
+				e.preventDefault();
+				//alert("클릭");
+				
+				// 글번호 꺼네옴
+				let postId = $(this).data("post-id");
+				alert(postId);
+				
+				 $.ajax({
+					type:"get"
+					, url: "/like/" + postId
+					, success:function(data) {
+						if (data.code == 200) {
+							location.reload(); // 새로고침 => 타임라인 화면 뿌려질때 하트 여부 나타남
+						} else if (data.code == 403) {
+							alert(data.error_message);
+							location.href = "/user/sign-in-view";
+						}
+					}
+					, error:function(e) {
+						alert("좋아요를 하는데 실패했습니다.")
+					} 
+					
+				}); // like btn ajax
+			}); // like btn 클릭
 		}); // --ready 함수 끝
     </script>
 </th:block>
