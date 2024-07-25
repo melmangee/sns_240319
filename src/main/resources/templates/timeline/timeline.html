@@ -33,7 +33,7 @@
 					<span class="font-weight-bold" th:text="${cardView.user.loginId}">글쓴이</span>
 					
 					<!-- 더보기 ...(로그인 된 사람과 글쓴이 정보 일치할 때 보이게) -->
-					<a th:if="${session.userId == cardView.post.userId}" href="#" class="more-btn">
+					<a th:if="${session.userId == cardView.post.userId}" href="#" class="more-btn" th:data-post-id="${cardView.post.id}" data-toggle="modal" data-target="#modal">
 						<img src="https://www.iconninja.com/files/860/824/939/more-icon.png" width="30">
 					</a>
 				</div>
@@ -84,7 +84,22 @@
 				</div> <!-- 댓글 끝 -->
 			</div> <!-- 카드 끝 -->
 		</div> <!-- 타임라인 박스 끝 -->
-	</div>
+
+<!-- Modal: 타임리프 레이아웃 때문에 session 태그 안쪽에 위치 -->
+<div class="modal fade" id="modal">
+<!-- modal-sm: 작은 모달창, modal-dialog-centered: 수직 기준 가운데 정렬 -->
+  <div class="modal-dialog modal-sm  modal-dialog-centered">
+    <div class="modal-content text-center">
+    	<div class="py-3">
+    	    <a href="#" id="postDeleteBtn">삭제하기</a>
+    	</div>
+    	<div class="py-3 border-top">
+    	    <a href="#" data-dismiss="modal">취소</a>
+    	</div>
+      </div>
+    </div>
+  </div>
+</div>	
 </section>
 
 <th:block layout:fragment="script">
@@ -277,6 +292,40 @@
 					
 				}); // like btn ajax
 			}); // like btn 클릭
+			
+			// 더보기(...) a 태그 클릭 => 모달 띄우기, 모달에 글번호 심어놓기
+			$(".more-btn").on('click', function(e) {
+				e.preventDefault(); // a 태그 위로 올라감 방지
+				let postId = $(this).data("post-id"); // getting
+				// alert(postId);
+				
+				// 1개만 존재하는 modal을 재활용하기 위해 data-post-id를 심어놓는다.
+				$("#modal").data('post-id', postId); // setting
+				//alert($("#modal").data('post-id', postId));
+			}); // 더보기 버튼 클릭 끝
+			
+			// 모달 안에 있는 '삭제하기' 클릭
+			$("#postDeleteBtn").on('click', function(e) {
+				e.preventDefault(); // a 태그 위로 올라감 방지
+				let postId = $("#modal").data("post-id");
+				alert(postId);
+			}); // 모달 안에 있는 삭제하기 버튼
+			
+			$.ajax({
+				type:"delete"
+				, url:"/post/delete"
+				, data:{"postId" : postId}
+				, success:function(data) {
+					if (data.code == 200) {
+						location.reload();
+					} else {
+						alert(data.error_message);
+					}
+				}
+				, error:function(e) {
+					alert("글 삭제에 실패하였습니다.");
+				}
+			}); // ajax
 		}); // --ready 함수 끝
     </script>
 </th:block>
