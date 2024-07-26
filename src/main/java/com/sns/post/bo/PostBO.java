@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.sns.comment.bo.CommentBO;
 import com.sns.common.FileManagerService;
+import com.sns.like.bo.LikeBO;
 import com.sns.post.entity.PostEntity;
 import com.sns.post.repository.PostRepository;
 
@@ -26,6 +27,9 @@ public class PostBO {
 	
 	@Autowired
 	private CommentBO commentBO;
+	
+	@Autowired
+	private LikeBO likeBO;
 
 	// input: X
 	// output: List<PostEntity>
@@ -47,28 +51,25 @@ public class PostBO {
 				.build());
 	}
 	
-	@Transactional
-	// input: postId userId
-	// output: X
+	//@Transactional
 	public void deletePostByPostIdUserId(int postId, int userId) {
-		
-		// 기존 글 존재시 삭제
+		// 기존 글 가져오기
 		PostEntity post = postRepository.findById(postId).orElse(null);
 		if (post == null) {
-			log.info("[글 삭제] post is null. postId:{}, userId:{}", postId, userId);
+			log.error("[delete post] postId:{}, userId:{}", postId, userId);
 			return;
 		}
-		
-		// 글 삭제 
+
+		// 글 삭제
 		postRepository.delete(post);
-		
-		// 이미지 삭제 삭제
+
+		// 이미지 있으면 삭제
 		fileManagerService.deleteFile(post.getImagePath());
-		
-		// 댓글 삭제
-		commentBO.deleteCommentsById(postId);
-		
-		// 좋아요 삭제
-		
+
+		// 댓글들 삭제
+		commentBO.deleteCommentsByPostId(postId);
+
+		// 좋아요들 삭제
+		likeBO.deleteLikeByPostId(postId);
 	}
 }

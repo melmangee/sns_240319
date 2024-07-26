@@ -15,8 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class FileManagerService {
 	// 실제 업로드가 된 이미지가 저장될 서버의 경로
-	//public static final String FILE_UPLOAD_PATH = "C:\\조성수\\6_Spring_project\\sns\\sns_workspace\\images/";
-	 public static final String FILE_UPLOAD_PATH = "D:\\조성수\\6_spring_project\\sns\\sns_workspace\\images/";
+	public static final String FILE_UPLOAD_PATH = "C:\\조성수\\6_Spring_project\\sns\\sns_workspace\\images/";
+	//public static final String FILE_UPLOAD_PATH = "D:\\조성수\\6_spring_project\\sns\\sns_workspace\\images/";
+	
 	
 	// input:MultipartFile, userLoginId
 	// output:String(이미지 경로)
@@ -58,20 +59,25 @@ public class FileManagerService {
 		// D:\\조성수\\6_spring_project\\sns\\sns_workspace\\images//images/aaaa_1721804745101/lake-7838004_640.jpg
 		Path path = Paths.get(FILE_UPLOAD_PATH + imagePath.replace("/images/", ""));
 		
-		// 이미지 삭제
-		try {
-			Files.delete(path);
-		} catch (IOException e) {
-			log.info("[FileManagerService 파일 삭제] 삭제 실패. path:{}", path.toString());
+		// 삭제할 이미지가 존재하는가?
+				if (Files.exists(path)) {
+					// 이미지 삭제
+					try {
+						Files.delete(path);
+					} catch (IOException e) {
+						log.info("[FileManagerService 파일삭제] 삭제 실패. path:{}", path.toString());
+						return;
+					}
+
+					// 폴더(디렉토리) 삭제
+					path = path.getParent();
+					if (Files.exists(path)) {
+						try {
+							Files.delete(path);
+						} catch (IOException e) {
+							log.info("[FileManagerService 파일삭제] 디렉토리 삭제 실패 path:{}", path.toString());
+						}
+					}
+				}
+			}
 		}
-		
-		// 폴더(디렉토리) 삭제
-		path = path.getParent();
-		try {
-			Files.delete(path);
-		} catch (IOException e) {
-			log.info("[FileManagerService 폴더 삭제] 삭제실패. path:{}", path.toString());
-		}
-	}
-	
-}

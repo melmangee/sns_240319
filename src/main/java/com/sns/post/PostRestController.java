@@ -22,6 +22,14 @@ public class PostRestController {
 	@Autowired
 	private PostBO postBO;
 	
+	
+	/**
+	 * 글쓰기 API
+	 * @param content
+	 * @param file
+	 * @param session
+	 * @return
+	 */
 	@PostMapping("/create")
 	public Map<String, Object> create(
 			@RequestParam(value = "content", required = false) String content,
@@ -45,22 +53,31 @@ public class PostRestController {
 		return result;
 	}
 	
+	/**
+	 * 글 삭제 API
+	 * @param postId
+	 * @param session
+	 * @return
+	 */
 	// delete
 	@DeleteMapping("/delete")
 	public Map<String, Object> delete(
 			@RequestParam("postId") int postId,
 			HttpSession session) {
 		
-		// 로그인 여부
-		int userId = (int)session.getAttribute("userId");
-		
-		// db delete
-		postBO.deletePostByPostIdUserId();
-		
-		// 응답값
 		Map<String, Object> result = new HashMap<>();
+		
+		Integer userId = (Integer)session.getAttribute("userId");
+		if (userId == null) {
+			result.put("code", 403);
+			result.put("error_message", "로그인을 다시 해주세요.");
+			return result;
+		}
+		
+		postBO.deletePostByPostIdUserId(postId, userId);
 		result.put("code", 200);
 		result.put("result", "성공");
+		
 		return result;
 	}
 }
